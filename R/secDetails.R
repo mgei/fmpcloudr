@@ -255,5 +255,32 @@ fmpc_earning_call_transcript <- function(symbols = c('AAPL'),
 
 }
 
+#' SEC filings
+#'
+#' @param symbols one or more symbols. Use NULL for general latest news
+#' @param type filing type, e.g. '10-K' (optional)
+#' @param limit limit results for each ticker
+#'
+#' @return data frame of ratings data
+#' @export
+#'
+#' @examples
+fmpc_sec_filings <- function(symbols = c('AAPL'),
+                             type = NULL,
+                             limit = 500) {
+  symbReq = hlp_symbolCheck(symbols)
+  callURL = paste0('sec_filings/',symbReq,'?limit=',limit,'&')
+
+  if (!is.null(type)) {
+    callURL = paste0(callURL,'type=',type,'&')
+  }
+
+  callDF = hlp_bindURLs(callURL)
+
+  hlp_respCheck(symbReq,callDF$symbol,'fmpc_sec_filings: ')
+
+  callDF
+}
+
 
 
