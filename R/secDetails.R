@@ -255,6 +255,43 @@ fmpc_earning_call_transcript <- function(symbols = c('AAPL'),
 
 }
 
+#' Get earning call dates for a company
+#'
+#' @param symbol one symbol, e.g. 'AAPL'
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fmpc_earning_call_dates <- function(symbol = 'AAPL') {
+
+  if (length(symbol) == 1) {
+    symbReq = symbol
+  } else {
+    stop('This function does not support multiple symbols, symbol argument has to be of length 1.')
+  }
+
+  callURL = paste0('earning_call_transcript?symbol=',symbReq,'&')
+
+  # Use custom function to collapse requests into data frame
+  # callDF = hlp_bindURLs(callURL)
+  callDF = fmpc_get_url(callURL, api_version = '4')
+
+  if (is.matrix(callDF)) {
+    colnames(callDF) = c('quarter', 'year', 'dateTime')
+
+    callDF = dplyr::as_tibble(callDF) %>%
+      dplyr::mutate(dateTime = lubridate::as_datetime(dateTime, tz = 'America/New_York'),
+                    symbol = symbol)
+
+  } else {
+    callDF = NULL
+  }
+
+  callDF
+
+}
+
 #' SEC filings
 #'
 #' @param symbols one or more symbols. Use NULL for general latest news
